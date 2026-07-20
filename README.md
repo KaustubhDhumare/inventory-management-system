@@ -86,17 +86,25 @@ client/
 ### Server
 
 ```text
-server/
-└── src/
-    ├── config/
-    ├── controllers/
-    ├── middleware/
-    ├── models/
-    ├── routes/
-    ├── services/
-    ├── utils/
-    ├── app.js
-    └── server.js
+backend/
+│
+├── src/
+│   ├── config/
+│   ├── controllers/
+│   ├── middleware/
+│   ├── models/
+│   ├── routes/
+│   ├── services/
+│   ├── validators/
+│   ├── utils/
+│   ├── constants/
+│   ├── app.js
+│   └── server.js
+│
+├── .env
+├── .gitignore
+├── package.json
+└── README.md
 ```
 
 ---
