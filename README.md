@@ -142,7 +142,7 @@ OBJECTIVES
     - Connect MongoDB Atlas
     - Verify server is running
 
-□ Objective 4: Database Architecture
+☑ Objective 4: Database Architecture
     - Design all collections
     - Create Mongoose schemas
     - Define relationships
@@ -186,80 +186,6 @@ OBJECTIVES
     - Deploy backend
 
 
-
-Inventory Management System ERD (Version 1)
-
-                                        ┌──────────────────┐
-                                        │      User        │
-                                        ├──────────────────┤
-                                        │ _id              │
-                                        │ name             │
-                                        │ email            │
-                                        │ password         │
-                                        │ role             │
-                                        │ isActive         │
-                                        │ createdAt        │
-                                        │ updatedAt        │
-                                        └────────┬─────────┘
-                                                 │
-                              Created By         │ Performs
-                                                 │
-                   ┌─────────────────────────────┼─────────────────────────────┐
-                   │                             │                             │
-                   ▼                             ▼                             ▼
-          ┌──────────────────┐         ┌──────────────────┐         ┌──────────────────┐
-          │   Product        │         │ PurchaseOrder    │         │    AuditLog      │
-          ├──────────────────┤         ├──────────────────┤         ├──────────────────┤
-          │ _id              │         │ _id              │         │ _id              │
-          │ name             │         │ supplier         │         │ user             │
-          │ sku              │         │ orderedItems[]   │         │ action           │
-          │ category         │────────►│ status           │         │ module           │
-          │ supplier         │         │ createdBy        │         │ description      │
-          │ quantity         │         │ receivedAt       │         │ createdAt        │
-          │ minQuantity      │         │ createdAt        │         └──────────────────┘
-          │ price            │         └────────┬─────────┘
-          │ status           │                  │
-          │ createdBy        │                  │
-          └────────┬─────────┘                  │
-                   │                            │
-                   │                            │ Creates Stock
-                   ▼                            ▼
-           ┌─────────────────────────────────────────────┐
-           │         InventoryTransaction                │
-           ├─────────────────────────────────────────────┤
-           │ _id                                         │
-           │ product                                     │
-           │ type (IN / OUT / ADJUSTMENT / RETURN)       │
-           │ quantity                                    │
-           │ previousQuantity                            │
-           │ newQuantity                                 │
-           │ performedBy                                 │
-           │ remarks                                     │
-           │ createdAt                                   │
-           └─────────────────────────────────────────────┘
-
-
-          ┌──────────────────┐
-          │    Category      │
-          ├──────────────────┤
-          │ _id              │
-          │ name             │
-          │ description      │
-          └──────────────────┘
-
-
-          ┌──────────────────┐
-          │    Supplier      │
-          ├──────────────────┤
-          │ _id              │
-          │ companyName      │
-          │ contactPerson    │
-          │ email            │
-          │ phone            │
-          │ address          │
-          └──────────────────┘
-
-
 Database Relationships (ERD)
 
                                     User
@@ -286,30 +212,39 @@ Database Relationships (ERD)
                            Product
 
 
-
-
-
-Cardinality (Important for Interviews)
-
-| Relationship                         | Type                                                         |
-| ------------------------------------ | ------------------------------------------------------------ |
-| User → Product                       | One-to-Many                                                  |
-| User → InventoryTransaction          | One-to-Many                                                  |
-| User → AuditLog                      | One-to-Many                                                  |
-| Category → Product                   | One-to-Many                                                  |
-| Supplier → Product                   | One-to-Many                                                  |
-| Supplier → PurchaseOrder             | One-to-Many                                                  |
-| Product → InventoryTransaction       | One-to-Many                                                  |
-| PurchaseOrder → InventoryTransaction | One-to-Many (or One-to-One if each PO is received only once) |
-
-
-
-The order I recommend is:
-
-User (independent)
-Category (independent)
-Supplier (independent)
-Product (depends on User, Category, Supplier)
-PurchaseOrder (depends on User, Supplier, Product)
-InventoryTransaction (depends on User, Product, PurchaseOrder)
-AuditLog (depends on User)
+Objective 5
+│
+├── 5.1 User Registration
+│      ├── Validate request
+│      ├── Check duplicate email
+│      ├── Hash password (already done)
+│      ├── Save user
+│      └── Return response
+│
+├── 5.2 User Login
+│      ├── Validate request
+│      ├── Find user
+│      ├── Compare password
+│      ├── Generate JWT
+│      └── Send token
+│
+├── 5.3 JWT Authentication
+│      ├── Generate Access Token
+│      ├── Generate Refresh Token
+│      ├── Store Refresh Token
+│      └── Token Refresh API
+│
+├── 5.4 Authentication Middleware
+│      ├── Verify JWT
+│      ├── Get current user
+│      └── Protect private routes
+│
+├── 5.5 Authorization Middleware
+│      ├── Admin only
+│      ├── Manager only
+│      └── Employee permissions
+│
+└── 5.6 Logout
+       ├── Clear Cookies
+       ├── Invalidate Refresh Token
+       └── Logout API
