@@ -1,7 +1,11 @@
+// PKG imports
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import morgan from "morgan";
+
+// Routers imports
+import authRoutes from "./routes/auth.routes.js"
 
 const app = express();
 
@@ -17,6 +21,8 @@ app.use(cookieParser());
 // Log HTTP requests
 app.use(morgan("dev"));
 
+
+app.use("/api/v1/auth", authRoutes)
 
 // Test route
 app.get("/", (req, res) => {
