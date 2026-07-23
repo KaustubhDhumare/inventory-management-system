@@ -52,6 +52,57 @@ const registerUser = async (userData)=>{
 
 };
 
+
+const loginUser = async (userData)=>{
+    const {
+        email,
+        password,
+    } = userData;
+
+    const user = await User.findOne( {email} ).select('+password') 
+    if(!user){
+        throw new ApiError(
+            401,
+            "invalid email or password."
+        )
+    }
+
+    if(!user.isActive){
+        throw new ApiError(
+            403,
+            "Your account has been deactivated by the admin."
+        )
+    }
+
+
+    const isPasswordCorrect = await user.comparePassword(password)
+
+    if(!isPasswordCorrect){
+        throw new ApiError(
+            401,
+            "invalid email or password"
+        )
+    }
+    const accessToken = user.generateAccessToken();
+    const refreshToken = user.generateRefreshToken();
+    user.refreshToken = refreshToken
+    await user.save({
+        validateBeforeSave: false,
+    })
+
+    const loggedInUser = await User.findById(user._id).select("-password -refreshToken");
+
+
+
+    return{
+        user: loggedInUser,
+        accessToken,
+        refreshToken,
+    }
+
+}
+
 export {
     registerUser,
+    loginUser
 };
