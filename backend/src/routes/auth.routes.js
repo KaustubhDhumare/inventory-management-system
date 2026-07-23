@@ -1,6 +1,6 @@
 import { Router } from "express"
-import { register } from "../controllers/auth.controller.js"
-import registerValidators from "../validators/auth.validator.js"
+import { register, login } from "../controllers/auth.controller.js"
+import {registerValidators, loginValidator} from "../validators/auth.validator.js"
 import validateRequest from "../middleware/validate.middleware.js"
 
 
@@ -11,6 +11,13 @@ router.post(
     registerValidators,
     validateRequest,
     register
+)
+
+router.post(
+    "/login",
+    loginValidator,
+    validateRequest,
+    login
 )
 
 

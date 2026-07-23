@@ -1,4 +1,5 @@
-import { registerUser } from "../services/auth.service.js";
+import { registerUser, loginUser } from "../services/auth.service.js";
+import { accessTokenCookieOption, refreshTokenCookieOption } from "../utils/cookieOptions.js"
 import asyncHandler from "../utils/asyncHandler.js"
 import ApiResponse from "../utils/ApiResponse.js"
 
@@ -9,19 +10,6 @@ const register = asyncHandler(async (req, resp) =>{
         accessToken,
         refreshToken,
     } = await registerUser(req.body);
-
-    const accessTokenCookieOption = {
-        httpOnly : true,
-        secure : process.env.NODE_ENV === "production",
-        sameSite: "strict",
-        maxAge: 15 * 60 * 1000 , 
-    };
-    const refreshTokenCookieOption = {
-        httpOnly : true,
-        secure : process.env.NODE_ENV === "production",
-        sameSite: "strict",
-        maxAge: 30 * 24 * 60 * 60 * 1000 ,
-    };
 
     return resp
         .status(201)
@@ -39,6 +27,33 @@ const register = asyncHandler(async (req, resp) =>{
 });
 
 
+
+const login = asyncHandler(async (req, resp)=>{
+    const {
+        user,
+        accessToken,
+        refreshToken
+    } = await loginUser(req.body)
+    
+    return resp
+        .status(200)
+        .cookie("accessToken", accessToken, accessTokenCookieOption )    
+        .cookie("refreshToken", refreshToken, refreshTokenCookieOption )    
+        .json(
+            new ApiResponse(
+                200,
+                {
+                    user,
+                },
+                "User logged in successfully"
+            )
+        );
+
+
+
+})
+
 export {
     register,
+    login
 }
