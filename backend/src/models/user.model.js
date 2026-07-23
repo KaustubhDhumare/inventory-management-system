@@ -1,5 +1,7 @@
-import mongoose, { STATES } from "mongoose";
-import bycrypt from "bcryptjs";
+import mongoose from "mongoose";
+import bcrypt from "bcryptjs";
+import ROLES from "../constants/roles.js";
+import jwt from "jsonwebtoken"
 
 const userSchema = new mongoose.Schema(
   {
@@ -29,13 +31,17 @@ const userSchema = new mongoose.Schema(
 
     role: {
       type: String,
-      enum: ["admin", "manager", "employee"],
+      enum: Object.values(ROLES),
       default: "employee",
     },
 
     isActive: {
       type: Boolean,
       default: true,
+    },
+
+    refreshToken: {
+      type: String,
     },
   },
   {
@@ -44,16 +50,41 @@ const userSchema = new mongoose.Schema(
 );
 
 userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
+  if (!this.isModified("password")) return next;
 
-  const salt = await bycrypt.genSalt(10);
-  this.password = await bycrypt.hash(this.password, salt);
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
 
-  next();
+  next;
 });
 
+userSchema.methods.generateAccessToken = function (){
+  return jwt.sign(
+    {
+      _id: this._id,
+      role: this.role,
+    },
+    process.env.JWT_ACCESS_SECRET,
+    {
+      expiresIn: process.env.JWT_ACCESS_EXPIRES_IN,
+    }
+  )
+}
+
+userSchema.methods.generateRefreshToken = function (){
+  return jwt.sign(
+    {
+      _id: this._id,
+    },
+    process.env.JWT_REFRESH_SECRET,
+    {
+      expiresIn: process.env.JWT_REFRESH_EXPIRES_IN
+    }
+  )
+}
+
 userSchema.methods.comparePassword = async function (enteredPassword) {
-  return await bycrypt.compare(enteredPassword, this.password);
+  return await bcrypt.compare(enteredPassword, this.password);
 };
 
 const User = mongoose.model("User", userSchema);
