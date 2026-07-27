@@ -1,5 +1,6 @@
-import User from "../models/user.model.js"
-import ApiError from "../utils/ApiError.js"
+import User from "../models/user.model.js";
+import ApiError from "../utils/ApiError.js";
+import jwt from "jsonwebtoken";
 
 
 const registerUser = async (userData)=>{
@@ -102,7 +103,69 @@ const loginUser = async (userData)=>{
 
 }
 
+
+const logoutUser = async (userId)=>{
+    const user  = await User.findById(userId);
+
+    if (!user){
+        throw new ApiError (404, "User not found");
+    }
+
+    user.refreshToken = null 
+
+    await user.save({
+        validateBeforeSave: false,
+    });
+
+    return true
+
+};
+
+
+const refreshAccessToken = async (incomingRefreshToken)=>{
+    if(!incomingRefreshToken){
+        throw new ApiError(401, "Refresh token is missing");
+    }
+
+    let decodedToken;
+    try{
+        decodedToken = jwt.verify(
+            incomingRefreshToken,
+            process.env.JWT_REFRESH_SECRET
+        );
+    } catch(error){
+        return new ApiError(401, "Invalid or expired refresh token");
+    }
+
+    const user = await User.findById(decodedToken._id);
+
+    if(!user){
+        throw new ApiError(401, "Invalid refresh token");
+    }
+
+    if(!user.isActive){
+        throw new ApiError(403, "Your account has been deactivated");
+    }
+
+    if(user.refreshToken !== incomingRefreshToken){
+        throw new ApiError(401, "Refresh token is invalid");
+    }
+
+    const accessToken = user.generateAccessToken();
+
+    const setUser = await User.findById(user._id).select("-password -refreshToken");
+
+    return{
+        accessToken,
+        user: setUser
+    }
+
+}
+
+
 export {
     registerUser,
-    loginUser
+    loginUser,
+    logoutUser,
+    refreshAccessToken
 };
