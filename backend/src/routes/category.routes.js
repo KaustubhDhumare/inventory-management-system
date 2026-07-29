@@ -3,8 +3,8 @@ import authenticate from "../middleware/auth.middleware.js";
 import authorizeRole from "../middleware/role.middleware.js";
 import validateRequest from "../middleware/validate.middleware.js";
 import ROLES from "../constants/roles.js";
-import { createCategoryValidator, updateCategoryValidator } from "../validators/category.validator.js";
-import { addCategory, getCategories, getCategory, updateCategory } from "../controllers/category.controller.js";
+import { createCategoryValidator, updateCategoryValidator, updateCategoryStatusValidator } from "../validators/category.validator.js";
+import { addCategory, getCategories, getCategory, updateCategory, updateCategoryStatus } from "../controllers/category.controller.js";
 
 
 
@@ -38,6 +38,15 @@ router.patch(
     updateCategoryValidator,
     validateRequest,
     updateCategory
+)
+
+router.patch(
+    "/:id/status",
+    authenticate,
+    authorizeRole(ROLES.ADMIN),
+    updateCategoryStatusValidator,
+    validateRequest,
+    updateCategoryStatus
 )
 
 
