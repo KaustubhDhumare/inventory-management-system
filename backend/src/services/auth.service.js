@@ -134,7 +134,7 @@ const refreshAccessToken = async (incomingRefreshToken)=>{
             process.env.JWT_REFRESH_SECRET
         );
     } catch(error){
-        return new ApiError(401, "Invalid or expired refresh token");
+        throw new ApiError(401, "Invalid or expired refresh token");
     }
 
     const user = await User.findById(decodedToken._id);
