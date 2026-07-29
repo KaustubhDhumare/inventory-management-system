@@ -3,6 +3,7 @@ import {
   getAllCategory,
   getCategoryById,
   updateCategory as updateCategoryService,
+  updateCategoryStatus as categoryStatus,
 } from "../services/category.service.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import ApiResponse from "../utils/ApiResponse.js";
@@ -15,7 +16,6 @@ const addCategory = asyncHandler(async (req, resp) => {
     .json(new ApiResponse(201, { category }, "Category created successfully"));
 });
 
-
 const getCategories = asyncHandler(async (req, resp) => {
   const categories = await getAllCategory(req.query);
 
@@ -26,34 +26,32 @@ const getCategories = asyncHandler(async (req, resp) => {
     );
 });
 
+const getCategory = asyncHandler(async (req, resp) => {
+  const category = await getCategoryById(req.params.id);
 
-const getCategory = asyncHandler(async (req, resp)=>{
-    const category = await getCategoryById(req.params.id);
-
-    return resp 
-        .status(200)
-        .json(
-            new ApiResponse(
-                200,
-                {category},
-                "Category fetched successfully"
-            )
-        )
+  return resp
+    .status(200)
+    .json(new ApiResponse(200, { category }, "Category fetched successfully"));
 });
 
+const updateCategory = asyncHandler(async (req, resp) => {
+  const updatedCategory = await updateCategoryService(req.params.id, req.body);
 
-const updateCategory = asyncHandler(async (req, resp)=>{
-  const updateCategory = await updateCategoryService(req.params.id, req.body);
-
-  return resp 
+  return resp
     .status(200)
     .json(
-      new ApiResponse(
-        200,
-        "Category updated successfully",
-        updateCategory
-      )
-    )
+      new ApiResponse(200, "Category updated successfully", updatedCategory),
+    );
 });
 
-export { addCategory, getCategories, getCategory, updateCategory };
+const updateCategoryStatus = asyncHandler(async (req, resp) => {
+  const updatedCategory = await categoryStatus(req.params.id, req.body.isActive);
+
+  return resp
+    .status(200)
+    .json(
+      new ApiResponse(200, "Category updated successfully", updatedCategory),
+    );
+});
+
+export { addCategory, getCategories, getCategory, updateCategory, updateCategoryStatus };

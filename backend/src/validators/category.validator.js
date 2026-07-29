@@ -36,4 +36,19 @@ const updateCategoryValidator = [
   }),
 ];
 
-export { createCategoryValidator, updateCategoryValidator };
+
+const updateCategoryStatusValidator = [
+    body("isActive")
+        .exists()
+        .withMessage("Status is required")
+        .isBoolean()
+        .withMessage("Status must be either true or false.")
+        .custom((value)=>{
+          if(typeof value !== "boolean"){
+            throw new Error ("Status must be a boolean.")
+          }
+          return true
+        })
+];
+
+export { createCategoryValidator, updateCategoryValidator, updateCategoryStatusValidator };
