@@ -4,8 +4,13 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import morgan from "morgan";
 
+// Error handler
+import errorHandler from "./middleware/error.middleware.js";
+
+
 // Routers imports
-import authRoutes from "./routes/auth.routes.js"
+import authRoutes from "./routes/auth.routes.js";
+import categoryRoutes from "./routes/category.routes.js";
 
 const app = express();
 
@@ -24,10 +29,9 @@ app.use(morgan("dev"));
 
 app.use("/api/v1/auth", authRoutes)
 
-// Test route
-app.get("/", (req, res) => {
-    res.send("Inventory Management API is running...");
-});
+app.use("/api/v1/categories", categoryRoutes)
 
 
+
+app.use(errorHandler)
 export default app
