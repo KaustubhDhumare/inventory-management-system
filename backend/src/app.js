@@ -11,6 +11,7 @@ import errorHandler from "./middleware/error.middleware.js";
 // Routers imports
 import authRoutes from "./routes/auth.routes.js";
 import categoryRoutes from "./routes/category.routes.js";
+import supplierRoutes from "./routes/supplier.routes.js"
 
 const app = express();
 
@@ -27,9 +28,17 @@ app.use(cookieParser());
 app.use(morgan("dev"));
 
 
+// Routes
 app.use("/api/v1/auth", authRoutes)
 
 app.use("/api/v1/categories", categoryRoutes)
+
+app.use("/api/v1/suppliers", supplierRoutes)
+
+
+
+
+
 
 
 

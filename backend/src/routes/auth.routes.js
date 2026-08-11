@@ -16,7 +16,7 @@ import ApiResponse from "../utils/ApiResponse.js";
 const router = Router();
 
 router.post("/register", registerValidators, validateRequest, register);
-
+ 
 router.post("/login", loginValidator, validateRequest, login);
 
 router.post("/refresh-token", refreshAccessToken);

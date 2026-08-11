@@ -43,7 +43,7 @@ const getAllCategory = async (query) => {
   if (search.trim()) {
     filter.name = {
       $regex: search,
-      $option: "i",
+      $options: "i",
     };
   }
 
@@ -146,7 +146,7 @@ const updateCategoryStatus = async (categoryId, isActive) => {
       400,
       `Category is already ${isActive ? "active" : "inactive"}`,
     );
-  }
+  }   
 
   const updateCategory = await Category.findByIdAndUpdate(
     categoryId,
