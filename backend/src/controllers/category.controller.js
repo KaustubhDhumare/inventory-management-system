@@ -1,3 +1,5 @@
+import asyncHandler from "../utils/asyncHandler.js";
+import ApiResponse from "../utils/ApiResponse.js";
 import {
   createCategory,
   getAllCategory,
@@ -5,8 +7,6 @@ import {
   updateCategory as updateCategoryService,
   updateCategoryStatus as categoryStatus,
 } from "../services/category.service.js";
-import asyncHandler from "../utils/asyncHandler.js";
-import ApiResponse from "../utils/ApiResponse.js";
 
 const addCategory = asyncHandler(async (req, resp) => {
   const category = await createCategory(req.body, req.user._id);
@@ -40,7 +40,7 @@ const updateCategory = asyncHandler(async (req, resp) => {
   return resp
     .status(200)
     .json(
-      new ApiResponse(200, "Category updated successfully", updatedCategory),
+      new ApiResponse(200, {category: updatedCategory}, "Category updated successfully"),
     );
 });
 
@@ -50,7 +50,7 @@ const updateCategoryStatus = asyncHandler(async (req, resp) => {
   return resp
     .status(200)
     .json(
-      new ApiResponse(200, "Category updated successfully", updatedCategory),
+      new ApiResponse(200, {category: updatedCategory}, "Category updated successfully"),
     );
 });
 
