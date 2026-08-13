@@ -1,8 +1,8 @@
-import mongoose, { Query } from "mongoose";
+import mongoose from "mongoose";
 import Supplier from "../models/supplier.model.js";
 import ApiError from "../utils/ApiError.js";
 import validateObjectId from "../utils/validateObjectId.js";
-import { getSuppliers } from "../controllers/supplier.controller.js";
+import buildRoleFilter from "../utils/buildRoleFilter.js";
 
 const createSupplier = async (supplierData, createdBy) => {
   const { companyName, contactPerson, email, phoneNo, address } = supplierData;
@@ -37,7 +37,7 @@ const createSupplier = async (supplierData, createdBy) => {
   return supplier;
 };
 
-const getAllSuppliers = async (query) => {
+const getAllSuppliers = async (query, role) => {
   const {
     page = 1,
     limit = 10,
@@ -50,9 +50,7 @@ const getAllSuppliers = async (query) => {
   const limitNumber = Number(limit);
   const skip = (pageNumber - 1) * limitNumber;
 
-  const filter = {
-    isActive: true,
-  };
+  const filter = buildRoleFilter(role)
 
   if (search.trim()) {
     filter.companyName = {
@@ -112,7 +110,7 @@ const updateSupplier = async (supplierId, updateData) => {
     const normalisedCompanyName = companyName.trim().toLowerCase();
 
     if (!normalisedCompanyName) {
-      throw new ApiError(400, "Comapany nama cannot be empty");
+      throw new ApiError(400, "Comapany name cannot be empty");
     }
     const existingSupplier = await Supplier.findOne({
       companyName: normalisedCompanyName,
@@ -121,12 +119,12 @@ const updateSupplier = async (supplierId, updateData) => {
       },
     });
 
-    if(existingSupplier){
-      throw new ApiError(409, "Supplier with this company name already exists")
+    if (existingSupplier) {
+      throw new ApiError(409, "Supplier with this company name already exists");
     }
-    allowedUpdates.companyName = normalisedCompanyName
+    allowedUpdates.companyName = normalisedCompanyName;
   }
-    if (contactPerson !== undefined) {
+  if (contactPerson !== undefined) {
     const normalizedContactPerson = contactPerson.trim();
 
     if (!normalizedContactPerson) {
@@ -145,17 +143,13 @@ const updateSupplier = async (supplierId, updateData) => {
     });
 
     if (existingSupplier) {
-      throw new ApiError(
-        409,
-        "Supplier with this email already exists"
-      );
+      throw new ApiError(409, "Supplier with this email already exists");
     }
 
     allowedUpdates.email = normalizedEmail;
   }
 
-
-   if (phoneNo !== undefined) {
+  if (phoneNo !== undefined) {
     const normalizedPhone = phoneNo.trim();
 
     const existingSupplier = await Supplier.findOne({
@@ -164,10 +158,7 @@ const updateSupplier = async (supplierId, updateData) => {
     });
 
     if (existingSupplier) {
-      throw new ApiError(
-        409,
-        "Supplier with this phone number already exists"
-      );
+      throw new ApiError(409, "Supplier with this phone number already exists");
     }
 
     allowedUpdates.phoneNo = normalizedPhone;
@@ -182,28 +173,30 @@ const updateSupplier = async (supplierId, updateData) => {
     allowedUpdates,
     {
       new: true,
-      runValidators: true
+      runValidators: true,
     },
   );
 
-  return updatedSupplier
+  return updatedSupplier;
 };
 
-
-const updateSupplierStatus = async(supplierId, isActive)=> {
-  validateObjectId(supplierId, "supplier id")
+const updateSupplierStatus = async (supplierId, isActive) => {
+  validateObjectId(supplierId, "supplier id");
   const supplier = await Supplier.findById(supplierId);
-  if(!supplier){
+  if (!supplier) {
     throw new ApiError(404, "Supplier not found");
   }
 
-  if(supplier.isActive === isActive){
-    throw new ApiError(400, `Supplier is already ${isActive ? "active" : "inactive"}`);
+  if (supplier.isActive === isActive) {
+    throw new ApiError(
+      400,
+      `Supplier is already ${isActive ? "active" : "inactive"}`,
+    );
   }
 
   const updatedSupplier = await Supplier.findByIdAndUpdate(
     supplierId,
-    {isActive},
+    { isActive },
     {
       new: true,
       runValidators: true,
@@ -212,5 +205,10 @@ const updateSupplierStatus = async(supplierId, isActive)=> {
   return updatedSupplier;
 };
 
-
-export { createSupplier, getAllSuppliers, getSupplierById, updateSupplier, updateSupplierStatus };
+export {
+  createSupplier,
+  getAllSuppliers,
+  getSupplierById,
+  updateSupplier,
+  updateSupplierStatus,
+};

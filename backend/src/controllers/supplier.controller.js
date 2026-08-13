@@ -12,17 +12,17 @@ const addSupplier = asyncHandler(async (req, resp) => {
   const supplier = await createSupplier(req.body, req.user._id);
 
   return resp
-    .status(201)
-    .json(new ApiResponse(201, { supplier }, "Supplier created successfully"));
+    .status(200)
+    .json(new ApiResponse(200, { supplier }, "Supplier created successfully"));
 });
 
 const getSuppliers = asyncHandler(async (req, resp) => {
-  const suppliers = await getAllSuppliers(req.query);
+  const suppliers = await getAllSuppliers(req.query, req.user.role);
 
   return resp
-    .status(201)
+    .status(200)
     .json(
-      new ApiResponse(201, { suppliers }, "Suppliers fetched successfully"),
+      new ApiResponse(200, { suppliers }, "Suppliers fetched successfully"),
     );
 });
 
@@ -42,7 +42,7 @@ const updateSupplier = asyncHandler(async (req, resp) => {
     .json(
       new ApiResponse(
         200,
-        { Supplier: updatedSupplier },
+        { supplier: updatedSupplier },
         "Supplier updated successfully",
       ),
     );
