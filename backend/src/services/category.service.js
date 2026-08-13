@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import Category from "../models/category.model.js";
 import ApiError from "../utils/ApiError.js";
 import validateObjectId from "../utils/validateObjectId.js";
+import ROLES from "../constants/roles.js"
 
 const createCategory = async (categoryData, createdBy) => {
   const { name, description } = categoryData;
@@ -23,7 +24,7 @@ const createCategory = async (categoryData, createdBy) => {
   return category;
 };
 
-const getAllCategory = async (query) => {
+const getAllCategory = async (query, role) => {
   const {
     page = 1,
     limit = 10,
@@ -36,9 +37,11 @@ const getAllCategory = async (query) => {
   const limitNumber = Number(limit);
   const skip = (pageNumber - 1) * limitNumber;
 
-  const filter = {
-    isActive: true,
-  };
+  const filter = {};
+
+  if(role !== ROLES.ADMIN){
+    filter.isActive = true;
+  }
 
   if (search.trim()) {
     filter.name = {

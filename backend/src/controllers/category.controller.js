@@ -17,7 +17,7 @@ const addCategory = asyncHandler(async (req, resp) => {
 });
 
 const getCategories = asyncHandler(async (req, resp) => {
-  const categories = await getAllCategory(req.query);
+  const categories = await getAllCategory(req.query, req.user.role);
 
   return resp
     .status(200)

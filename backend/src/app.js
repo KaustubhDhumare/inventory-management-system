@@ -11,7 +11,8 @@ import errorHandler from "./middleware/error.middleware.js";
 // Routers imports
 import authRoutes from "./routes/auth.routes.js";
 import categoryRoutes from "./routes/category.routes.js";
-import supplierRoutes from "./routes/supplier.routes.js"
+import supplierRoutes from "./routes/supplier.routes.js";
+import productRoutes from "./routes/product.routes.js"
 
 const app = express();
 
@@ -35,9 +36,7 @@ app.use("/api/v1/categories", categoryRoutes)
 
 app.use("/api/v1/suppliers", supplierRoutes)
 
-
-
-
+app.use("/api/v1/products", productRoutes)
 
 
 
