@@ -5,10 +5,20 @@ import Supplier from "../models/supplier.model.js";
 import ApiError from "../utils/ApiError.js";
 import validateObjectId from "../utils/validateObjectId.js";
 import buildRoleFilter from "../utils/buildRoleFilter.js";
+import ROLES from "../constants/roles.js";
 
 const createProduct = async (productData, createdBy) => {
-  const { name, sku, description, price, quantity, minimumStock, unit, category, supplier } =
-    productData;
+  const {
+    name,
+    sku,
+    description,
+    price,
+    quantity,
+    minimumStock,
+    unit,
+    category,
+    supplier,
+  } = productData;
 
   const normalisedSku = sku.trim().toLowerCase();
   const normalisedCategory = category.trim().toLowerCase();
@@ -69,11 +79,11 @@ const getAllProducts = async (query, role) => {
   const limitNumber = Number(limit);
   const skip = (pageNumber - 1) * limitNumber;
 
-  const filter = buildRoleFilter(role)
-  
+  const filter = buildRoleFilter(role);
+
   if (search.trim()) {
     filter.name = {
-      $regex: "search",
+      $regex: search,
       $options: "i",
     };
   }
@@ -240,7 +250,7 @@ const updateProductStatus = async (productId, isActive) => {
 
   const updatedProduct = await Product.findByIdAndUpdate(
     productId,
-    {isActive},
+    { isActive },
     {
       new: true,
       runValidators: true,
@@ -249,4 +259,10 @@ const updateProductStatus = async (productId, isActive) => {
   return updatedProduct;
 };
 
-export { createProduct, getAllProducts, getProductById, updateProduct, updateProductStatus };
+export {
+  createProduct,
+  getAllProducts,
+  getProductById,
+  updateProduct,
+  updateProductStatus,
+};

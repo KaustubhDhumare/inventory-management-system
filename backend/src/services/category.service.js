@@ -3,6 +3,7 @@ import Category from "../models/category.model.js";
 import ApiError from "../utils/ApiError.js";
 import validateObjectId from "../utils/validateObjectId.js";
 import ROLES from "../constants/roles.js"
+import buildRoleFilter from "../utils/buildRoleFilter.js";
 
 const createCategory = async (categoryData, createdBy) => {
   const { name, description } = categoryData;
@@ -37,11 +38,7 @@ const getAllCategory = async (query, role) => {
   const limitNumber = Number(limit);
   const skip = (pageNumber - 1) * limitNumber;
 
-  const filter = {};
-
-  if(role !== ROLES.ADMIN){
-    filter.isActive = true;
-  }
+  const filter = buildRoleFilter(role)
 
   if (search.trim()) {
     filter.name = {

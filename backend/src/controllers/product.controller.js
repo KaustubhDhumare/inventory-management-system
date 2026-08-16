@@ -63,4 +63,10 @@ const updateProductStatus = asyncHandler(async (req, resp) => {
     );
 });
 
-export { addProduct, getProducts, getProduct, updateProduct, updateProductStatus };
+export {
+  addProduct,
+  getProducts,
+  getProduct,
+  updateProduct,
+  updateProductStatus,
+};

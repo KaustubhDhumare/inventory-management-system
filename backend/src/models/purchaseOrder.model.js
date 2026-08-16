@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+import PURCHASE_ORDER_STATUS from "../constants/purchaseOrderStatus.js";
+
 
 const orderedItemSchema = new mongoose.Schema(
   {
@@ -12,10 +14,10 @@ const orderedItemSchema = new mongoose.Schema(
       required: true,
       min: [1, "Order quantity must be at least 1"],
     },
-    recievedQuantity: {
+    receivedQuantity: {
       type: Number,
-      required: true,
-      min: [0, "Recieved quantity cannot be negative"],
+      min: [0, "Received quantity cannot be negative"],
+      default: 0,
     },
     unitCost: {
       type: Number,
@@ -33,6 +35,7 @@ const purchaseOrderSchema = new mongoose.Schema(
     poNumber: {
       type: String,
       unique: true,
+      required: true,
       index: true,
     },
     supplier: {
@@ -45,7 +48,7 @@ const purchaseOrderSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-    orderedItem: {
+    orderedItems: {
       type: [orderedItemSchema],
       validate: {
         validator: function (items) {
@@ -61,8 +64,8 @@ const purchaseOrderSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["Pending", "Partially recieved", "Complete", "Cancelled"],
-      default: "Pending",
+      enum: Object.values(PURCHASE_ORDER_STATUS),
+      default: PURCHASE_ORDER_STATUS.PENDING,
     },
     expectedDeliveryDate: {
       type: Date,
@@ -70,7 +73,7 @@ const purchaseOrderSchema = new mongoose.Schema(
     notes: {
       type: String,
       trim: true,
-      maxlenght: [500, "Notes cannot exceed 500 characters"],
+      maxlength: [500, "Notes cannot exceed 500 characters"],
     },
   },
   {
