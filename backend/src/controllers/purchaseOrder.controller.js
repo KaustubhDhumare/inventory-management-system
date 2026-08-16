@@ -1,6 +1,12 @@
 import ApiResponse from "../utils/ApiResponse.js";
 import asyncHandler from "../utils/asyncHandler.js";
-import { createPurchaseOrder as createPurchaseOrderService, getAllPurchaseOrders } from "../services/purchaseOrder.service.js";
+import {
+  createPurchaseOrder as createPurchaseOrderService,
+  getAllPurchaseOrders,
+  getPurchseOrdersById,
+  updatePurchseOrder as updatedPurchaseOrderService,
+  cancelPurchaseOrder as cancelPurchaseOrderService,
+} from "../services/purchaseOrder.service.js";
 
 const createPurchaseOrder = asyncHandler(async (req, resp) => {
   const purchaseOrder = await createPurchaseOrderService(
@@ -19,11 +25,24 @@ const createPurchaseOrder = asyncHandler(async (req, resp) => {
     );
 });
 
+const getPurchseOrders = asyncHandler(async (req, resp) => {
+  const purchaseOrders = await getAllPurchaseOrders(req.query);
 
-const getPurchseOrders = asyncHandler(async (req, resp)=>{
-  const purchaseOrder = await getAllPurchaseOrders(req.query);
+  return resp
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        { purchaseOrders },
+        "Purchase orders fetched successfully",
+      ),
+    );
+});
 
-    return resp
+const getPurchaseOrder = asyncHandler(async (req, resp) => {
+  const purchaseOrder = await getPurchseOrdersById(req.params.id);
+
+  return resp
     .status(200)
     .json(
       new ApiResponse(
@@ -31,7 +50,44 @@ const getPurchseOrders = asyncHandler(async (req, resp)=>{
         { purchaseOrder },
         "Purchase order fetched successfully",
       ),
-    );  
-})
+    );
+});
 
-export { createPurchaseOrder, getPurchseOrders };
+const updatePurchseOrder = asyncHandler(async (req, resp) => {
+  const updatedPurchaseOrder = await updatedPurchaseOrderService(
+    req.params.id,
+    req.body,
+  );
+
+  return resp
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        { purchaseOrder: updatedPurchaseOrder },
+        "Purchase order updated successfully",
+      ),
+    );
+});
+
+const cancelPurchaseOrder = asyncHandler(async (req, resp) => {
+  const cancelledPurchseOrder = await cancelPurchaseOrderService(req.params.id);
+
+  return resp
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        { purchaseOrder: cancelledPurchseOrder },
+        "Purchase order cancelled successfully",
+      ),
+    );
+});
+
+export {
+  createPurchaseOrder,
+  getPurchseOrders,
+  getPurchaseOrder,
+  updatePurchseOrder,
+  cancelPurchaseOrder,
+};
