@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import PRODUCT_UNITS from "../constants/productUnits.js";
 
 const productSchema = new mongoose.Schema(
   {
@@ -41,7 +42,7 @@ const productSchema = new mongoose.Schema(
     },
     unit: {
       type: String,
-      enum: ["piece", "kg", "liter", "box"],
+      enum: Object.values(PRODUCT_UNITS),
       default: "piece"
     },
     category: {

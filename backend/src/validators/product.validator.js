@@ -1,4 +1,5 @@
 import { body } from "express-validator";
+import PRODUCT_UNITS from "../constants/productUnits.js";
 
 const createProductValidators = [
   body("name")
@@ -40,7 +41,7 @@ const createProductValidators = [
 
   body("unit")
     .optional()
-    .isIn(["piece", "kg", "liter", "box"])
+    .isIn(Object.values(PRODUCT_UNITS))
     .withMessage("Unit must be one of: piece, kg, liter, box"),
 ];
 
