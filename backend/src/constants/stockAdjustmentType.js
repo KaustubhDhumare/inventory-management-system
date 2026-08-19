@@ -1,0 +1,6 @@
+const STOCK_ADJUSTMENT_TYPE = Object.freeze({
+  INCREASE: "INCREASE",
+  DECREASE: "DECREASE",
+});
+
+export default STOCK_ADJUSTMENT_TYPE;

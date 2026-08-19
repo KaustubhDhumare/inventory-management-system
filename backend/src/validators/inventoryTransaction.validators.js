@@ -1,5 +1,6 @@
 import { body, query } from "express-validator";
 import INVENTORY_TRANSACTION_TYPE from "../constants/inventoryTransactionType.js";
+import STOCK_ADJUSTMENT_TYPE from "../constants/stockAdjustmentType.js";
 
 const receivePurchseOrderValidators = [
   body("items")
@@ -56,4 +57,35 @@ const getInventoryTransactionValidators = [
     .withMessage("Sort order must be asc or desc"),
 ];
 
-export { receivePurchseOrderValidators, getInventoryTransactionValidators };
+const adjustStockValidators = [
+  body("product")
+    .notEmpty()
+    .withMessage("Product is received")
+    .isMongoId()
+    .withMessage("Invalid product id"),
+
+  body("quantity")
+    .notEmpty()
+    .withMessage("Quantity is required")
+    .isFloat({ min: 1 })
+    .withMessage("Adjustment quantity must be at least 1"),
+
+  body("adjustmentType")
+    .notEmpty()
+    .withMessage("Adjustment type is required")
+    .isIn(Object.values(STOCK_ADJUSTMENT_TYPE))
+    .withMessage("Adjustment type must be INCREASE or DECREASE"),
+
+  body("remarks")
+    .trim()
+    .notEmpty()
+    .withMessage("Remarks are required")
+    .isLength({ max: 500 })
+    .withMessage("Remarks cannot exceed 500 characters"),
+];
+
+export {
+  receivePurchseOrderValidators,
+  getInventoryTransactionValidators,
+  adjustStockValidators,
+};
