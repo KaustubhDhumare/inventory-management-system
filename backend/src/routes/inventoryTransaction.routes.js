@@ -3,8 +3,8 @@ import authenticate from "../middleware/auth.middleware.js";
 import authorizeRole from "../middleware/role.middleware.js";
 import validateRequest from "../middleware/validate.middleware.js";
 import ROLES from "../constants/roles.js";
-import { receivePurchseOrderValidators, getInventoryTransactionValidators } from "../validators/inventoryTransaction.validators.js";
-import { receivePurchaseOrderItems, getInventoryTransactions } from "../controllers/inventoryTransaction.controller.js";
+import { receivePurchseOrderValidators, getInventoryTransactionValidators, adjustStockValidators } from "../validators/inventoryTransaction.validators.js";
+import { receivePurchaseOrderItems, getInventoryTransactions, adjustStock } from "../controllers/inventoryTransaction.controller.js";
 
 
 const router = Router()
@@ -27,6 +27,15 @@ router.get(
     validateRequest,
     getInventoryTransactions,
 );
+
+router.post(
+    "/adjust",
+    authenticate,
+    authorizeRole(ROLES.ADMIN),
+    adjustStockValidators,
+    validateRequest,
+    adjustStock
+)
 
 
 

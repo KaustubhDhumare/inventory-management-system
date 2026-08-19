@@ -42,7 +42,7 @@ app.use("/api/v1/products", productRoutes);
 
 app.use("/api/v1/purchase-orders", purchseOrderRoutes);
 
-app.use("/api/v1/inventory-transaction", inventoryTransactionRoutes);
+app.use("/api/v1/inventory-transactions", inventoryTransactionRoutes);
 
 
 
