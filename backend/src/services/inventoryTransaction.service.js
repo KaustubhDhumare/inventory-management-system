@@ -218,15 +218,79 @@ const getAllInventoryTransactions = async (queryParams) => {
   };
 };
 
-const adjustInventoryStock = async (
-  productId,
-  adjustmentData,
-  performedBy,
-) => {
+const adjustInventoryStock = async (productId, adjustmentData, performedBy) => {
   validateObjectId(productId, "product id");
   validateObjectId(performedBy, "performed ny user id");
 
-  const {quantity, adjustmentType, remarks}= adjustmentData;
+  const { quantity, adjustmentType, remarks } = adjustmentData;
+
+  const session = await mongoose.startSession();
+
+  try {
+    session.startTransaction();
+
+    const product = await Product.findOne({
+      _id: productId,
+      isActive: true,
+    }).session(session);
+
+    if (!product) {
+      throw new ApiError(404, "Product not found");
+    }
+
+    const previousQuantity = product.quantity;
+
+    let newQuantity;
+
+    if (adjustmentType === STOCK_ADJUSTMENT_TYPE.INCREASE) {
+      newQuantity = previousQuantity + quantity;
+    } else if (adjustmentType === STOCK_ADJUSTMENT_TYPE.DECREASE) {
+      if (quantity > previousQuantity) {
+        throw new ApiError(
+          400,
+          `Cannot decrease stock by ${quantity}. only ${previousQuantity} units available`,
+        );
+      }
+      newQuantity = previousQuantity - quantity;
+    } else {
+      throw new ApiError(400, "Invalid adjustment type");
+    }
+
+    product.quantity = newQuantity;
+
+    await product.save({ session });
+
+    const transaction = await InventoryTransaction.create([
+      {
+        product: product._id,
+        performedBy,
+        type: INVENTORY_TRANSACTION_TYPE.ADJUSTMENT,
+        quantity,
+        previousQuantity,
+        newQuantity,
+        remarks,
+      },
+    ]);
+
+    await session.commitTransaction();
+
+    return {
+      product,
+      transaction: transaction[0],
+    };
+  } catch (error) {
+    await session.abortTransaction();
+    throw error;
+  } finally {
+    await session.endSession();
+  }
+};
+
+const damageInventoryStock = async (productId, damageData, performedBy) => {
+  validateObjectId(productId, "product id");
+  validateObjectId(performedBy, "performed by user id");
+
+  const {quantity, remarks} = damageData;
 
   const session = await mongoose.startSession();
 
@@ -236,66 +300,58 @@ const adjustInventoryStock = async (
     const product = await Product.findOne({
       _id: productId,
       isActive: true,
-    }).session(session);
+    });
 
     if(!product){
-      throw new ApiError(404, "Product not found");
+      throw new ApiError(404, "Product id not found");
     }
 
     const previousQuantity = product.quantity;
 
-    let newQuantity;
-
-    if(adjustmentType === STOCK_ADJUSTMENT_TYPE.INCREASE){
-      newQuantity = previousQuantity + quantity;
-    } else if(adjustmentType === STOCK_ADJUSTMENT_TYPE.DECREASE) {
-      if(quantity > previousQuantity){
-        throw new ApiError(400, `Cannot decrease stock by ${quantity}. only ${previousQuantity} units available`);
-      }
-      newQuantity = previousQuantity - quantity;
-    } else {
-      throw new ApiError(400, "Invalid adjustment type");
+    if(quantity > previousQuantity){
+      throw new ApiError(
+        400,
+        `Cannot damage ${quantity} units, only ${previousQuantity} units available`
+      );
     }
+
+    const newQuantity = previousQuantity - quantity;
 
     product.quantity = newQuantity;
 
     await product.save({session});
 
+    const transaction = await InventoryTransaction.create([
+      {
+        product: product._id,
+        performedBy,
+        type: INVENTORY_TRANSACTION_TYPE.DAMAGE,
+        quantity,
+        previousQuantity,
+        newQuantity,
+        remarks,
+      },
+    ],
+  );
 
-    const transaction = await InventoryTransaction.create(
-      [
-        {
-          product: product._id,
-          performedBy,
-          type: INVENTORY_TRANSACTION_TYPE.ADJUSTMENT,
-          quantity,
-          previousQuantity,
-          newQuantity,
-          remarks,
-        },
-      ],
-    );
+  await session.commitTransaction();
 
-    await session.commitTransaction();
-
-    return{
-      product,
-      transaction: transaction[0],
-    };
-
+  return{
+    product,
+    transaction: transaction[0],
+  };
+  
   } catch (error){
     await session.abortTransaction();
     throw error;
-  } finally {
+  } finally{
     await session.endSession();
   }
 };
-
-
-
 
 export {
   receivePurchaseOrder,
   getAllInventoryTransactions,
   adjustInventoryStock,
+  damageInventoryStock,
 };
