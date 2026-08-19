@@ -84,8 +84,34 @@ const adjustStockValidators = [
     .withMessage("Remarks cannot exceed 500 characters"),
 ];
 
+
+const damageStockValidators = [
+    body("product")
+    .notEmpty()
+    .withMessage("Product is received")
+    .isMongoId()
+    .withMessage("Invalid product id"),
+
+  body("quantity")
+    .notEmpty()
+    .withMessage("Quantity is required")
+    .isFloat({ min: 1 })
+    .withMessage("Adjustment quantity must be at least 1"),
+
+    body("remarks")
+    .trim()
+    .notEmpty()
+    .withMessage("Remarks are required")
+    .isLength({ max: 500 })
+    .withMessage("Remarks cannot exceed 500 characters"),
+];
+
+
+
+
 export {
   receivePurchseOrderValidators,
   getInventoryTransactionValidators,
   adjustStockValidators,
+  damageStockValidators,
 };
