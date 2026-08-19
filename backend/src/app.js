@@ -14,6 +14,7 @@ import categoryRoutes from "./routes/category.routes.js";
 import supplierRoutes from "./routes/supplier.routes.js";
 import productRoutes from "./routes/product.routes.js";
 import purchseOrderRoutes from "./routes/purchaseOrder.routes.js";
+import inventoryTransactionRoutes from "./routes/inventoryTransaction.routes.js"
 
 const app = express();
 
@@ -40,6 +41,8 @@ app.use("/api/v1/suppliers", supplierRoutes);
 app.use("/api/v1/products", productRoutes);
 
 app.use("/api/v1/purchase-orders", purchseOrderRoutes);
+
+app.use("/api/v1/inventory-transaction", inventoryTransactionRoutes);
 
 
 

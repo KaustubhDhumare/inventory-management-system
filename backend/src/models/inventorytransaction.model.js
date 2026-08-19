@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import INVENTORY_TRANSACTION_TYPE from "../constants/inventoryTransactionType.js";
 
 const inventoryTransactionSchema = new mongoose.Schema(
   {
@@ -6,20 +7,23 @@ const inventoryTransactionSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Product",
       required: true,
+      index: true,
     },
     purchaseOrder: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "PurchaseOrder",
+      index: true,
     },
     performedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
+      index: true,
     },
     type: {
       type: String,
-      enum: ["PURCHASE", "SALE", "RETURN", "ADJUSTMENT", "DAMAGE"],
-      default: "PURCHASE",
+      enum: Object.values(INVENTORY_TRANSACTION_TYPE),
+      default: INVENTORY_TRANSACTION_TYPE.PURCHASE,
     },
     quantity: {
       type: Number,
