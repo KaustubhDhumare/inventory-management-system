@@ -8,12 +8,16 @@ import {
   getInventoryTransactionValidators,
   adjustStockValidators,
   damageStockValidators,
+  returnStockValidators,
+  sellStockValidators,
 } from "../validators/inventoryTransaction.validators.js";
 import {
   receivePurchaseOrderItems,
   getInventoryTransactions,
   adjustStock,
   damageStock,
+  returnStock,
+  sellStock,
 } from "../controllers/inventoryTransaction.controller.js";
 
 const router = Router();
@@ -53,5 +57,26 @@ router.post(
   validateRequest,
   damageStock,
 );
+
+router.post(
+  "/return",
+  authenticate,
+  authorizeRole(ROLES.ADMIN),
+  returnStockValidators,
+  validateRequest,
+  returnStock,
+);
+
+router.post(
+  "/sale",
+  authenticate,
+  authorizeRole(ROLES.ADMIN),
+  sellStockValidators,
+  validateRequest,
+  sellStock,
+);
+
+
+
 
 export default router;

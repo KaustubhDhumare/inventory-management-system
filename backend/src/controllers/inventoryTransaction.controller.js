@@ -5,6 +5,8 @@ import {
   getAllInventoryTransactions,
   adjustInventoryStock,
   damageInventoryStock,
+  returnInventoryStock,
+  sellInventoryStock,
 } from "../services/inventoryTransaction.service.js";
 
 const receivePurchaseOrderItems = asyncHandler(async (req, resp) => {
@@ -60,14 +62,43 @@ const damageStock = asyncHandler(async (req, resp) => {
 
   return resp
     .status(200)
-    .json(
-      new ApiResponse(200, { result }, "Stock damaged successfully"),
-    );
+    .json(new ApiResponse(200, { result }, "Stock damaged successfully"));
 });
+
+const returnStock = asyncHandler(async (req, resp) => {
+  const result = await returnInventoryStock(
+    req.body.product,
+    req.body,
+    req.user._id,
+  );
+
+  return resp
+    .status(200)
+    .json(new ApiResponse(200, { result }, "Stock returned successfully"));
+});
+
+
+const sellStock = asyncHandler(async (req, resp) => {
+  const result = await sellInventoryStock(
+    req.body.product,
+    req.body,
+    req.user._id,
+  );
+
+  return resp
+    .status(200)
+    .json(new ApiResponse(200, { result }, "Stock sold successfully"));
+});
+
+
+
+
 
 export {
   receivePurchaseOrderItems,
   getInventoryTransactions,
   adjustStock,
   damageStock,
+  returnStock,
+  sellStock
 };

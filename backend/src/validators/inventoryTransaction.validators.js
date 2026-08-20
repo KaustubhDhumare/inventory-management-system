@@ -15,11 +15,11 @@ const receivePurchseOrderValidators = [
     .isMongoId()
     .withMessage("Invalid product id"),
 
-  body("items.*.receivedQuantity")
+  body("items.*.requiredQuantity")
     .exists()
-    .withMessage("Received quantity is required")
+    .withMessage("required quantity is required")
     .isInt({ min: 1 })
-    .withMessage("Received quantity must be at least 1"),
+    .withMessage("required quantity must be at least 1"),
 
   body("remarks")
     .optional()
@@ -57,18 +57,28 @@ const getInventoryTransactionValidators = [
     .withMessage("Sort order must be asc or desc"),
 ];
 
-const adjustStockValidators = [
-  body("product")
-    .notEmpty()
-    .withMessage("Product is received")
-    .isMongoId()
-    .withMessage("Invalid product id"),
+const productValidator = body("product")
+  .notEmpty()
+  .withMessage("Product is required")
+  .isMongoId()
+  .withMessage("Invalid product id");
 
-  body("quantity")
-    .notEmpty()
-    .withMessage("Quantity is required")
-    .isFloat({ min: 1 })
-    .withMessage("Adjustment quantity must be at least 1"),
+const quantityValidator = body("quantity")
+  .notEmpty()
+  .withMessage("Quantity is required")
+  .isFloat({ min: 1 })
+  .withMessage("Quantity must be at least 1");
+
+const remarksValidator = body("remarks")
+  .trim()
+  .notEmpty()
+  .withMessage("Remarks are required")
+  .isLength({ max: 500 })
+  .withMessage("Remarks cannot exceed 500 characters");
+
+const adjustStockValidators = [
+  productValidator,
+  quantityValidator,
 
   body("adjustmentType")
     .notEmpty()
@@ -76,42 +86,32 @@ const adjustStockValidators = [
     .isIn(Object.values(STOCK_ADJUSTMENT_TYPE))
     .withMessage("Adjustment type must be INCREASE or DECREASE"),
 
-  body("remarks")
-    .trim()
-    .notEmpty()
-    .withMessage("Remarks are required")
-    .isLength({ max: 500 })
-    .withMessage("Remarks cannot exceed 500 characters"),
+  remarksValidator,
 ];
-
 
 const damageStockValidators = [
-    body("product")
-    .notEmpty()
-    .withMessage("Product is received")
-    .isMongoId()
-    .withMessage("Invalid product id"),
-
-  body("quantity")
-    .notEmpty()
-    .withMessage("Quantity is required")
-    .isFloat({ min: 1 })
-    .withMessage("Adjustment quantity must be at least 1"),
-
-    body("remarks")
-    .trim()
-    .notEmpty()
-    .withMessage("Remarks are required")
-    .isLength({ max: 500 })
-    .withMessage("Remarks cannot exceed 500 characters"),
+  productValidator,
+  quantityValidator,
+  remarksValidator,
 ];
 
+const returnStockValidators = [
+  productValidator,
+  quantityValidator,
+  remarksValidator,
+];
 
-
+const sellStockValidators = [
+  productValidator,
+  quantityValidator,
+  remarksValidator,
+];
 
 export {
   receivePurchseOrderValidators,
   getInventoryTransactionValidators,
   adjustStockValidators,
   damageStockValidators,
+  returnStockValidators,
+  sellStockValidators,
 };
