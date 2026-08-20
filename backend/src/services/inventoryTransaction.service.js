@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { mongo } from "mongoose";
 import Product from "../models/product.model.js";
 import PurchaseOrder from "../models/purchaseOrder.model.js";
 import InventoryTransaction from "../models/inventorytransaction.model.js";
@@ -158,7 +158,10 @@ const receivePurchaseOrder = async (
 
     return purchaseOrder;
   } catch (error) {
-    await session.abortTransaction();
+    if (session.inTransaction()) {
+      await session.abortTransaction();
+    }
+
     throw error;
   } finally {
     await session.endSession();
@@ -260,17 +263,20 @@ const adjustInventoryStock = async (productId, adjustmentData, performedBy) => {
 
     await product.save({ session });
 
-    const transaction = await InventoryTransaction.create([
-      {
-        product: product._id,
-        performedBy,
-        type: INVENTORY_TRANSACTION_TYPE.ADJUSTMENT,
-        quantity,
-        previousQuantity,
-        newQuantity,
-        remarks,
-      },
-    ]);
+    const transaction = await InventoryTransaction.create(
+      [
+        {
+          product: product._id,
+          performedBy,
+          type: INVENTORY_TRANSACTION_TYPE.ADJUSTMENT,
+          quantity,
+          previousQuantity,
+          newQuantity,
+          remarks,
+        },
+      ],
+      { session },
+    );
 
     await session.commitTransaction();
 
@@ -279,7 +285,10 @@ const adjustInventoryStock = async (productId, adjustmentData, performedBy) => {
       transaction: transaction[0],
     };
   } catch (error) {
-    await session.abortTransaction();
+    if (session.inTransaction()) {
+      await session.abortTransaction();
+    }
+
     throw error;
   } finally {
     await session.endSession();
@@ -290,28 +299,28 @@ const damageInventoryStock = async (productId, damageData, performedBy) => {
   validateObjectId(productId, "product id");
   validateObjectId(performedBy, "performed by user id");
 
-  const {quantity, remarks} = damageData;
+  const { quantity, remarks } = damageData;
 
   const session = await mongoose.startSession();
 
-  try{
+  try {
     session.startTransaction();
 
     const product = await Product.findOne({
       _id: productId,
       isActive: true,
-    });
+    }).session(session);
 
-    if(!product){
+    if (!product) {
       throw new ApiError(404, "Product id not found");
     }
 
     const previousQuantity = product.quantity;
 
-    if(quantity > previousQuantity){
+    if (quantity > previousQuantity) {
       throw new ApiError(
         400,
-        `Cannot damage ${quantity} units, only ${previousQuantity} units available`
+        `Cannot damage ${quantity} units, only ${previousQuantity} units available`,
       );
     }
 
@@ -319,32 +328,163 @@ const damageInventoryStock = async (productId, damageData, performedBy) => {
 
     product.quantity = newQuantity;
 
-    await product.save({session});
+    await product.save({ session });
 
-    const transaction = await InventoryTransaction.create([
-      {
-        product: product._id,
-        performedBy,
-        type: INVENTORY_TRANSACTION_TYPE.DAMAGE,
-        quantity,
-        previousQuantity,
-        newQuantity,
-        remarks,
-      },
-    ],
-  );
+    const transaction = await InventoryTransaction.create(
+      [
+        {
+          product: product._id,
+          performedBy,
+          type: INVENTORY_TRANSACTION_TYPE.DAMAGE,
+          quantity,
+          previousQuantity,
+          newQuantity,
+          remarks,
+        },
+      ],
+      { session },
+    );
 
-  await session.commitTransaction();
+    await session.commitTransaction();
 
-  return{
-    product,
-    transaction: transaction[0],
-  };
-  
-  } catch (error){
-    await session.abortTransaction();
+    return {
+      product,
+      transaction: transaction[0],
+    };
+  } catch (error) {
+    if (session.inTransaction()) {
+      await session.abortTransaction();
+    }
+
     throw error;
-  } finally{
+  } finally {
+    await session.endSession();
+  }
+};
+
+const returnInventoryStock = async (productId, returnData, performedBy) => {
+  validateObjectId(productId, "product id");
+  validateObjectId(performedBy, "performed by user id");
+
+  const { quantity, remarks } = returnData;
+
+  const session = await mongoose.startSession();
+
+  try {
+    session.startTransaction();
+
+    const product = await Product.findOne({
+      _id: productId,
+      isActive: true,
+    }).session(session);
+
+    if (!product) {
+      throw new ApiError(404, "Product id not found");
+    }
+
+    const previousQuantity = product.quantity;
+
+    const newQuantity = previousQuantity + quantity;
+
+    product.quantity = newQuantity;
+
+    await product.save({ session });
+
+    const transaction = await InventoryTransaction.create(
+      [
+        {
+          product: product._id,
+          performedBy,
+          type: INVENTORY_TRANSACTION_TYPE.RETURN,
+          quantity,
+          previousQuantity,
+          newQuantity,
+          remarks,
+        },
+      ],
+      { session },
+    );
+
+    await session.commitTransaction();
+
+    return {
+      product,
+      transaction: transaction[0],
+    };
+  } catch (error) {
+    if (session.inTransaction()) {
+      await session.abortTransaction();
+    }
+
+    throw error;
+  } finally {
+    await session.endSession();
+  }
+};
+
+const sellInventoryStock = async (productId, saleData, performedBy) => {
+  validateObjectId(productId, "product id");
+  validateObjectId(performedBy, "performed by user id");
+
+  const { quantity, remarks } = saleData;
+
+  const session = await mongoose.startSession();
+
+  try {
+    session.startTransaction();
+
+    const product = await Product.findOne({
+      _id: productId,
+      isActive: true,
+    }).session(session);
+
+    if (!product) {
+      throw new ApiError(404, "Product not found");
+    }
+
+    const previousQuantity = product.quantity;
+
+    if (quantity > previousQuantity) {
+      throw new ApiError(
+        400,
+        `Cannot sell ${quantity} units. Only ${previousQuantity} units are available`,
+      );
+    }
+
+    const newQuantity = previousQuantity - quantity;
+
+    product.quantity = newQuantity;
+
+    await product.save({ session });
+
+    const transaction = await InventoryTransaction.create(
+      [
+        {
+          product: productId,
+          performedBy,
+          type: INVENTORY_TRANSACTION_TYPE.SALE,
+          quantity,
+          previousQuantity,
+          newQuantity,
+          remarks,
+        },
+      ],
+      { session },
+    );
+
+    await session.commitTransaction();
+
+    return {
+      product,
+      transaction: transaction[0],
+    };
+  } catch (error) {
+    if (session.inTransaction()) {
+      await session.abortTransaction();
+    }
+
+    throw error;
+  } finally {
     await session.endSession();
   }
 };
@@ -354,4 +494,6 @@ export {
   getAllInventoryTransactions,
   adjustInventoryStock,
   damageInventoryStock,
+  returnInventoryStock,
+  sellInventoryStock,
 };
