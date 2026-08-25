@@ -3,10 +3,9 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import morgan from "morgan";
-
+import helmet from "helmet"; 
 // Error handler
 import errorHandler from "./middleware/error.middleware.js";
-
 
 // Routers imports
 import authRoutes from "./routes/auth.routes.js";
@@ -19,18 +18,24 @@ import dashboardRoutes from "./routes/dashboard.routes.js";
 
 const app = express();
 
+app.use(helmet());
+
 // Parse JSON request bodies
 app.use(express.json());
 
 // Enable Cross-Origin Resource Sharing
-app.use(cors());
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL,
+    credentials: true,
+  }),
+);
 
 // Parse cookies
 app.use(cookieParser());
 
 // Log HTTP requests
 app.use(morgan("dev"));
-
 
 // Routes
 app.use("/api/v1/auth", authRoutes);
@@ -47,8 +52,5 @@ app.use("/api/v1/inventory-transactions", inventoryTransactionRoutes);
 
 app.use("/api/v1/dashboard", dashboardRoutes);
 
-
-
-
-app.use(errorHandler)
-export default app
+app.use(errorHandler);
+export default app;
