@@ -45,7 +45,6 @@ const createProductValidators = [
     .withMessage("Unit must be one of: piece, kg, liter, box"),
 ];
 
-
 const updateProductValidators = [
   body("name")
     .trim()
@@ -85,17 +84,9 @@ const updateProductValidators = [
     .isIn(["piece", "kg", "liter", "box"])
     .withMessage("Unit must be one of: piece, kg, liter, box"),
 
-  body("category")
-    .trim()
-    .optional()
-    .notEmpty()
-    .withMessage("Category cannot be empty"),
+  body("category").optional().isMongoId().withMessage("Invalid category id"),
 
-  body("supplier")
-    .trim()
-    .optional()
-    .notEmpty()
-    .withMessage("Supplier cannot be empty"),
+  body("supplier").optional().isMongoId().withMessage("Invalid supplier id"),
 
   body().custom((value) => {
     if (
@@ -117,21 +108,21 @@ const updateProductValidators = [
 ];
 
 const updateProductStatusValidators = [
-  body('isActive')
+  body("isActive")
     .exists()
     .withMessage("Status is required")
     .isBoolean()
     .withMessage("Status must be either true or false")
-    .custom((value)=>{
-      if(typeof value !== "boolean"){
-        throw new Error ("Status must be boolean")
+    .custom((value) => {
+      if (typeof value !== "boolean") {
+        throw new Error("Status must be boolean");
       }
-      return true 
-    })
-]
+      return true;
+    }),
+];
 
 export {
-    createProductValidators,
-    updateProductValidators,
-    updateProductStatusValidators,
-  }
+  createProductValidators,
+  updateProductValidators,
+  updateProductStatusValidators,
+};

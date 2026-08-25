@@ -15,11 +15,11 @@ const receivePurchseOrderValidators = [
     .isMongoId()
     .withMessage("Invalid product id"),
 
-  body("items.*.requiredQuantity")
+  body("items.*.receivedQuantity")
     .exists()
-    .withMessage("required quantity is required")
+    .withMessage("Received quantity is required")
     .isInt({ min: 1 })
-    .withMessage("required quantity must be at least 1"),
+    .withMessage("Received quantity must be at least 1"),
 
   body("remarks")
     .optional()

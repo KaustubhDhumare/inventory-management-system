@@ -59,9 +59,9 @@ const updatePurchaseOrderValidators = [
 
   body("orderedItems.*.product")
     .if(body("orderedItems").exists())
-    .trim()
-    .notEmpty()
-    .withMessage("Product is required for every ordered item"),
+    .optional()
+    .isMongoId()
+    .withMessage("Invalid product id"),
 
   body("orderedItems.*.orderedQuantity")
     .if(body("orderedItems").exists())
@@ -113,5 +113,4 @@ export {
   createPurchaseOrderValidators,
   updatePurchaseOrderValidators,
   cancelPurchaseOrderValidator,
-  
 };

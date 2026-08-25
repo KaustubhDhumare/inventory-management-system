@@ -5,6 +5,8 @@ import validateRequest from "../middleware/validate.middleware.js";
 import ROLES from "../constants/roles.js";
 import { createSupplierValidator, updateSupplierValidator, updateSupplierStatusValidators } from "../validators/supplier.validator.js";
 import { addSupplier, getSupplier, getSuppliers, updateSupplier, updateSupplierStatus } from "../controllers/supplier.controller.js";
+import mongoIdParamValidator from "../validators/mongoIdParam.validator.js";
+
 
 const router = Router()
 
@@ -26,6 +28,7 @@ router.get(
 router.get(
     "/:id",
     authenticate,
+    mongoIdParamValidator("id", "supplier id"),
     getSupplier,
 )
 
@@ -33,6 +36,7 @@ router.patch(
     "/:id",
     authenticate,
     authorizeRole(ROLES.ADMIN),
+    mongoIdParamValidator("id", "supplier id"),
     updateSupplierValidator,
     validateRequest,
     updateSupplier
@@ -42,6 +46,7 @@ router.patch(
     "/:id/status",
     authenticate,
     authorizeRole(ROLES.ADMIN),
+    mongoIdParamValidator("id", "supplier id"),
     updateSupplierStatusValidators,
     validateRequest,
     updateSupplierStatus
