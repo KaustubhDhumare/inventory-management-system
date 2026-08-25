@@ -248,7 +248,7 @@ const cancelPurchaseOrder = async (purchaseOrderId) => {
   const cancelledPurchseOrder = await PurchaseOrder.findByIdAndUpdate(
     purchaseOrderId,
     {
-      status: PURCHASE_ORDER_STATUS.CANCELLED,
+      status: PURCHASE_ORDER_STATUS.CANCELLED, 
     },
     {
       new: true,

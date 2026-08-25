@@ -5,7 +5,7 @@ import validateRequest from "../middleware/validate.middleware.js";
 import ROLES from "../constants/roles.js";
 import { cancelPurchaseOrder, createPurchaseOrder, getPurchaseOrder, getPurchseOrders, updatePurchseOrder } from "../controllers/purchaseOrder.controller.js";
 import { cancelPurchaseOrderValidator, createPurchaseOrderValidators, updatePurchaseOrderValidators } from "../validators/purchseOrder.validators.js";
-
+import mongoIdParamValidator from "../validators/mongoIdParam.validator.js";
 
 const router = Router()
 
@@ -29,6 +29,7 @@ router.get(
     "/:id",
     authenticate,
     authorizeRole(ROLES.ADMIN),
+    mongoIdParamValidator("id", "purchaseOrder id"),
     getPurchaseOrder,
 );
 
@@ -36,6 +37,7 @@ router.patch(
     "/:id",
     authenticate,
     authorizeRole(ROLES.ADMIN),
+    mongoIdParamValidator("id", "purchaseOrder id"), 
     updatePurchaseOrderValidators,
     validateRequest,
     updatePurchseOrder
@@ -45,6 +47,7 @@ router.patch(
     "/:id/status",
     authenticate,
     authorizeRole(ROLES.ADMIN),
+    mongoIdParamValidator("id", "purchaseOrder id"),
     cancelPurchaseOrderValidator,
     validateRequest,
     cancelPurchaseOrder
