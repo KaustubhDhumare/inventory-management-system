@@ -11,13 +11,19 @@ import {
 } from "../validators/auth.validator.js";
 import validateRequest from "../middleware/validate.middleware.js";
 import authenticate from "../middleware/auth.middleware.js";
-import ApiResponse from "../utils/ApiResponse.js";
+import authRateLimiter from "../middleware/rateLimit.middleware.js";
 
 const router = Router();
 
-router.post("/register", registerValidators, validateRequest, register);
- 
-router.post("/login", loginValidator, validateRequest, login);
+router.post(
+  "/register",
+  authRateLimiter,
+  registerValidators,
+  validateRequest,
+  register,
+);
+
+router.post("/login", authRateLimiter, loginValidator, validateRequest, login);
 
 router.post("/refresh-token", refreshAccessToken);
 
