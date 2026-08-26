@@ -51,6 +51,8 @@ const inventoryTransactionSchema = new mongoose.Schema(
   },
 );
 
+inventoryTransactionSchema.index({ createdAt: -1 });
+
 const InventoryTransaction = mongoose.model(
   "InventoryTransaction",
   inventoryTransactionSchema,
