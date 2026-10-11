@@ -62,7 +62,7 @@ const getInventoryStatus = async () => {
   };
 };
 
-const getBasicStats = async () => {
+const getBasicStats = async (includePurchaseOrders) => {
   const [
     totalSuppliers,
     totalCategories,
@@ -73,13 +73,17 @@ const getBasicStats = async () => {
 
     Category.countDocuments(),
 
-    PurchaseOrder.countDocuments({
-      status: PURCHASE_ORDER_STATUS.PENDING,
-    }),
+    includePurchaseOrders
+      ? PurchaseOrder.countDocuments({
+          status: PURCHASE_ORDER_STATUS.PENDING,
+        })
+      : null,
 
-    PurchaseOrder.countDocuments({
-      status: PURCHASE_ORDER_STATUS.PARTIALLY_RECEIVED,
-    }),
+    includePurchaseOrders
+      ? PurchaseOrder.countDocuments({
+          status: PURCHASE_ORDER_STATUS.PARTIALLY_RECEIVED,
+        })
+      : null,
   ]);
 
   return {
@@ -98,6 +102,73 @@ const getRecentTransactions = async () => {
     .populate("performedBy", "name email");
 };
 
+const getInventoryMovement = async () => {
+  const today = new Date();
+  const start = new Date(
+    Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate() - 6),
+  );
+  const rows = await InventoryTransaction.aggregate([
+    { $match: { createdAt: { $gte: start, $lte: today } } },
+    {
+      $group: {
+        _id: {
+          $dateToString: {
+            format: "%Y-%m-%d",
+            date: "$createdAt",
+            timezone: "UTC",
+          },
+        },
+        stockIn: {
+          $sum: {
+            $cond: [
+              {
+                $or: [
+                  { $in: ["$type", ["PURCHASE", "RETURN"]] },
+                  {
+                    $and: [
+                      { $eq: ["$type", "ADJUSTMENT"] },
+                      { $gt: ["$newQuantity", "$previousQuantity"] },
+                    ],
+                  },
+                ],
+              },
+              1,
+              0,
+            ],
+          },
+        },
+        stockOut: {
+          $sum: {
+            $cond: [
+              {
+                $or: [
+                  { $in: ["$type", ["SALE", "DAMAGE"]] },
+                  {
+                    $and: [
+                      { $eq: ["$type", "ADJUSTMENT"] },
+                      { $lt: ["$newQuantity", "$previousQuantity"] },
+                    ],
+                  },
+                ],
+              },
+              1,
+              0,
+            ],
+          },
+        },
+      },
+    },
+  ]);
+
+  const byDay = new Map(rows.map((row) => [row._id, row]));
+  return Array.from({ length: 7 }, (_, index) => {
+    const date = new Date(start.getTime() + index * 24 * 60 * 60 * 1000);
+    const key = date.toISOString().slice(0, 10);
+    const row = byDay.get(key);
+    return { date: key, stockIn: row?.stockIn ?? 0, stockOut: row?.stockOut ?? 0 };
+  });
+};
+
 const getRecentPurchaseOrders = async () => {
   return PurchaseOrder.find()
     .sort({ createdAt: -1 })
@@ -106,19 +177,22 @@ const getRecentPurchaseOrders = async () => {
     .populate("orderBy", "name email");
 };
 
-const getDashboard = async () => {
-  const [inventory, basicStats, recentTransactions, recentPurchaseOrders] =
+const getDashboard = async (role) => {
+  const isAdmin = role === "admin";
+  const [inventory, basicStats, recentTransactions, inventoryMovement, recentPurchaseOrders] =
     await Promise.all([
       getInventoryStatus(),
-      getBasicStats(),
-      getRecentTransactions(),
-      getRecentPurchaseOrders(),
+      getBasicStats(isAdmin),
+      isAdmin ? getRecentTransactions() : [],
+      getInventoryMovement(),
+      isAdmin ? getRecentPurchaseOrders() : [],
     ]);
 
   return {
     inventory,
     ...basicStats,
     recentTransactions,
+    inventoryMovement,
     recentPurchaseOrders,
   };
 };

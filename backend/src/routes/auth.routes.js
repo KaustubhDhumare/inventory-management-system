@@ -4,10 +4,12 @@ import {
   login,
   logout,
   refreshAccessToken,
+  changePassword,
 } from "../controllers/auth.controller.js";
 import {
   registerValidators,
   loginValidator,
+  changePasswordValidator,
 } from "../validators/auth.validator.js";
 import validateRequest from "../middleware/validate.middleware.js";
 import authenticate from "../middleware/auth.middleware.js";
@@ -26,6 +28,15 @@ router.post(
 router.post("/login", authRateLimiter, loginValidator, validateRequest, login);
 
 router.post("/refresh-token", refreshAccessToken);
+
+router.patch(
+  "/change-password",
+  authenticate,
+  authRateLimiter,
+  changePasswordValidator,
+  validateRequest,
+  changePassword,
+);
 
 router.post("/logout", authenticate, logout);
 

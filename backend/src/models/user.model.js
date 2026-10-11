@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import ROLES from "../constants/roles.js";
+import { ASSIGNABLE_EMPLOYEE_PERMISSIONS, EMPLOYEE_DEFAULT_PERMISSIONS } from "../constants/permissions.js";
 import jwt from "jsonwebtoken"
 
 const userSchema = new mongoose.Schema(
@@ -35,6 +36,16 @@ const userSchema = new mongoose.Schema(
       default: "employee",
     },
 
+    permissions: {
+      type: [{ type: String, enum: ASSIGNABLE_EMPLOYEE_PERMISSIONS }],
+      default: () => [...EMPLOYEE_DEFAULT_PERMISSIONS],
+    },
+
+    authVersion: {
+      type: Number,
+      default: 0,
+    },
+
     isActive: {
       type: Boolean,
       default: true,
@@ -49,13 +60,11 @@ const userSchema = new mongoose.Schema(
   },
 );
 
-userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next;
+userSchema.pre("save", async function () {
+  if (!this.isModified("password")) return;
 
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
-
-  next;
 });
 
 userSchema.methods.generateAccessToken = function (){
@@ -63,6 +72,7 @@ userSchema.methods.generateAccessToken = function (){
     {
       _id: this._id,
       role: this.role,
+      authVersion: this.authVersion || 0,
     },
     process.env.JWT_ACCESS_SECRET,
     {

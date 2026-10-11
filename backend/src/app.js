@@ -1,3 +1,4 @@
+import "dotenv/config";
 // PKG imports
 import express from "express";
 import cors from "cors";
@@ -15,21 +16,51 @@ import productRoutes from "./routes/product.routes.js";
 import purchseOrderRoutes from "./routes/purchaseOrder.routes.js";
 import inventoryTransactionRoutes from "./routes/inventoryTransaction.routes.js";
 import dashboardRoutes from "./routes/dashboard.routes.js";
+import userRoutes from "./routes/user.routes.js";
 
 const app = express();
 
+const configuredOrigins = (process.env.FRONTEND_URL || "")
+  .split(",")
+  .map((value) => {
+    try {
+      return new URL(value.trim()).origin;
+    } catch {
+      return null;
+    }
+  })
+  .filter(Boolean);
+
+const isAllowedOrigin = (origin) => {
+  if (!origin) return true;
+
+  try {
+    const requestOrigin = new URL(origin);
+    if (configuredOrigins.includes(requestOrigin.origin)) return true;
+
+    return (
+      process.env.NODE_ENV !== "production" &&
+      ["localhost", "127.0.0.1", "::1", "[::1]"].includes(requestOrigin.hostname)
+    );
+  } catch {
+    return false;
+  }
+};
+
 app.use(helmet());
+
+// Enable CORS before parsing requests so preflight requests are handled first.
+app.use(
+  cors({
+    origin: (origin, callback) =>
+      callback(null, isAllowedOrigin(origin) ? origin : false),
+    credentials: true,
+    optionsSuccessStatus: 204,
+  }),
+);
 
 // Parse JSON request bodies
 app.use(express.json());
-
-// Enable Cross-Origin Resource Sharing
-app.use(
-  cors({
-    origin: process.env.FRONTEND_URL,
-    credentials: true,
-  }),
-);
 
 // Parse cookies
 app.use(cookieParser());
@@ -51,6 +82,8 @@ app.use("/api/v1/purchase-orders", purchseOrderRoutes);
 app.use("/api/v1/inventory-transactions", inventoryTransactionRoutes);
 
 app.use("/api/v1/dashboard", dashboardRoutes);
+
+app.use("/api/v1/users", userRoutes);
 
 app.use(errorHandler);
 export default app;

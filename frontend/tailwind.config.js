@@ -1,0 +1,4 @@
+export default {
+  content: ['./index.html', './src/**/*.{js,jsx}'],
+  theme: { extend: { fontFamily: { sans: ['Inter', 'ui-sans-serif', 'system-ui'], mono: ['JetBrains Mono', 'ui-monospace', 'monospace'] }, colors: { app:'var(--bg-app)', sidebar:'var(--bg-sidebar)', panel:'var(--bg-panel)', elevated:'var(--bg-elevated)', input:'var(--bg-input)', line:'var(--border)', ink:{DEFAULT:'var(--text-primary)',2:'var(--text-secondary)',3:'var(--text-muted)'}, accent:{DEFAULT:'var(--accent)',solid:'var(--accent-solid)',hover:'var(--accent-hover)',soft:'var(--accent-soft)',2:'var(--accent-2)'}, ok:'var(--success)',warn:'var(--warning)',bad:'var(--danger)' }, boxShadow:{panel:'var(--shadow-panel)',pop:'var(--shadow-pop)'}, borderRadius:{lg:'8px',xl:'12px'}, transitionTimingFunction:{app:'var(--ease)'} } }, plugins: []
+};

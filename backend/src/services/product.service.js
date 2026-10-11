@@ -88,12 +88,27 @@ const getAllProducts = async (query, role) => {
     };
   }
 
+  if (query.stock === "LOW_STOCK") {
+    filter.isActive = true;
+    filter.$expr = {
+      $and: [
+        { $gt: ["$quantity", 0] },
+        { $lte: ["$quantity", "$minimumStock"] },
+      ],
+    };
+  } else if (query.stock === "OUT_OF_STOCK") {
+    filter.isActive = true;
+    filter.quantity = 0;
+  }
+
   const totalDocumnet = await Product.countDocuments(filter);
 
   const product = await Product.find(filter)
     .sort({ [sortBy]: sortOrder === "asc" ? 1 : -1 })
     .skip(skip)
-    .limit(limitNumber);
+    .limit(limitNumber)
+    .populate("category", "name")
+    .populate("supplier", "companyName");
 
   return {
     product,
@@ -111,7 +126,9 @@ const getProductById = async (productId) => {
   const product = await Product.findOne({
     _id: productId,
     isActive: true,
-  });
+  })
+    .populate("category", "name")
+    .populate("supplier", "companyName");
 
   if (!product) {
     throw new ApiError(404, "Product not found");

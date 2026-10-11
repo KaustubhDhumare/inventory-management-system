@@ -1,8 +1,8 @@
 import { Router } from "express";
 import authenticate from "../middleware/auth.middleware.js";
-import authorizeRole from "../middleware/role.middleware.js";
+import authorizePermission from "../middleware/permission.middleware.js";
 import validateRequest from "../middleware/validate.middleware.js";
-import ROLES from "../constants/roles.js";
+import { PERMISSIONS } from "../constants/permissions.js";
 import {
   receivePurchseOrderValidators,
   getInventoryTransactionValidators,
@@ -25,7 +25,7 @@ const router = Router();
 router.post(
   "/purchase-order/:id/receive",
   authenticate,
-  authorizeRole(ROLES.ADMIN),
+  authorizePermission(PERMISSIONS.PURCHASE_ORDERS_MANAGE),
   receivePurchseOrderValidators,
   validateRequest,
   receivePurchaseOrderItems,
@@ -34,7 +34,7 @@ router.post(
 router.get(
   "/",
   authenticate,
-  authorizeRole(ROLES.ADMIN),
+  authorizePermission(PERMISSIONS.TRANSACTIONS_READ),
   getInventoryTransactionValidators,
   validateRequest,
   getInventoryTransactions,
@@ -43,7 +43,7 @@ router.get(
 router.post(
   "/adjust",
   authenticate,
-  authorizeRole(ROLES.ADMIN),
+  authorizePermission(PERMISSIONS.INVENTORY_ADJUST),
   adjustStockValidators,
   validateRequest,
   adjustStock,
@@ -52,7 +52,7 @@ router.post(
 router.post(
   "/damage",
   authenticate,
-  authorizeRole(ROLES.ADMIN),
+  authorizePermission(PERMISSIONS.INVENTORY_DAMAGE),
   damageStockValidators,
   validateRequest,
   damageStock,
@@ -61,7 +61,7 @@ router.post(
 router.post(
   "/return",
   authenticate,
-  authorizeRole(ROLES.ADMIN),
+  authorizePermission(PERMISSIONS.INVENTORY_RETURN),
   returnStockValidators,
   validateRequest,
   returnStock,
@@ -70,7 +70,7 @@ router.post(
 router.post(
   "/sale",
   authenticate,
-  authorizeRole(ROLES.ADMIN),
+  authorizePermission(PERMISSIONS.INVENTORY_SALE),
   sellStockValidators,
   validateRequest,
   sellStock,

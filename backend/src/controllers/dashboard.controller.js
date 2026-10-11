@@ -3,7 +3,7 @@ import ApiResponse from "../utils/ApiResponse.js";
 import { getDashboard } from "../services/dashboard.service.js";
 
 const getDashboardData = asyncHandler(async (req, resp) => {
-  const dashboard = await getDashboard();
+  const dashboard = await getDashboard(req.user.role);
 
   return resp
     .status(200)

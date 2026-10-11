@@ -154,10 +154,10 @@ const updatePurchseOrder = async (purchaseOrderId, updateData) => {
 
   // Supplier
   if (supplier !== undefined) {
-    const normalizedSupplier = supplier.trim().toLowerCase();
+    validateObjectId(supplier, "supplier id");
 
     const supplierDoc = await Supplier.findOne({
-      companyName: normalizedSupplier,
+      _id: supplier,
       isActive: true,
     });
 
@@ -248,7 +248,7 @@ const cancelPurchaseOrder = async (purchaseOrderId) => {
   const cancelledPurchseOrder = await PurchaseOrder.findByIdAndUpdate(
     purchaseOrderId,
     {
-      status: PURCHASE_ORDER_STATUS.CANCELLED, 
+      status: PURCHASE_ORDER_STATUS.CANCELLED,
     },
     {
       new: true,

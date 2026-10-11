@@ -9,7 +9,6 @@ const registerUser = async (userData)=>{
         name, 
         email,
         password,
-        role
     } = userData
 
     const existingUser = await User.findOne({email});
@@ -25,7 +24,7 @@ const registerUser = async (userData)=>{
         name, 
         email,
         password,
-        role,
+        role: "employee",
     });
 
     const accessToken = user.generateAccessToken();
@@ -103,6 +102,30 @@ const loginUser = async (userData)=>{
 
 }
 
+const changeUserPassword = async (userId, currentPassword, newPassword) => {
+    const user = await User.findById(userId).select("+password");
+    if (!user) throw new ApiError(404, "User not found");
+    if (!user.isActive) throw new ApiError(403, "Your account has been deactivated");
+
+    const isCurrentPasswordCorrect = await user.comparePassword(currentPassword);
+    if (!isCurrentPasswordCorrect) {
+        throw new ApiError(400, "Current password is incorrect");
+    }
+    if (currentPassword === newPassword) {
+        throw new ApiError(400, "New password must be different from your current password");
+    }
+
+    user.password = newPassword;
+    user.authVersion = (user.authVersion || 0) + 1;
+    const accessToken = user.generateAccessToken();
+    const refreshToken = user.generateRefreshToken();
+    user.refreshToken = refreshToken;
+    await user.save();
+
+    const safeUser = await User.findById(user._id).select("-password -refreshToken");
+    return { user: safeUser, accessToken, refreshToken };
+};
+
 
 const logoutUser = async (userId)=>{
     const user  = await User.findById(userId);
@@ -166,6 +189,7 @@ const refreshAccessToken = async (incomingRefreshToken)=>{
 export {
     registerUser,
     loginUser,
+    changeUserPassword,
     logoutUser,
     refreshAccessToken
 };
