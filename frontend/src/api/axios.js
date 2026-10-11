@@ -1,6 +1,11 @@
 import axios from 'axios';
 
-const api = axios.create({ baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1', withCredentials: true, headers: { 'Content-Type': 'application/json' } });
+// In production, call the Vercel origin so auth cookies are first-party.
+// Vercel proxies /api/v1/* to Render (see vercel.json).
+const baseURL = import.meta.env.PROD
+  ? '/api/v1'
+  : (import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1');
+const api = axios.create({ baseURL, withCredentials: true, headers: { 'Content-Type': 'application/json' } });
 const authPaths = ['/auth/login', '/auth/register', '/auth/refresh-token'];
 let refreshing = false;
 let waiters = [];
