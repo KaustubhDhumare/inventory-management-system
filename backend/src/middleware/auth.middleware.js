@@ -31,6 +31,10 @@ const authenticate = asyncHandler( async (req, resp, next)=>{
         throw new ApiError(403, "Your account has been deactivated");
     }
 
+    if (decodedToken.authVersion !== (user.authVersion || 0)) {
+        throw new ApiError(401, "Your session has expired because your access changed");
+    }
+
     req.user = user;
     next();
 

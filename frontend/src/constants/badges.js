@@ -1,0 +1,4 @@
+export const PO_STATUS = { PENDING:['Pending','warn'], PARTIALLY_RECEIVED:['Partially received','accent2'], COMPLETED:['Completed','ok'], CANCELLED:['Cancelled','muted'] };
+export const TX_TYPES = { PURCHASE:['Purchase','accent'], SALE:['Sale','ok'], RETURN:['Return','accent2'], ADJUSTMENT:['Adjustment','violet'], DAMAGE:['Damage','bad'] };
+export const toneClass = { warn:'bg-warn/10 text-warn ring-warn/25', accent2:'bg-accent-2/10 text-accent-2 ring-accent-2/25', ok:'bg-ok/10 text-ok ring-ok/25', accent:'bg-accent/10 text-accent ring-accent/25', bad:'bg-bad/10 text-bad ring-bad/25', muted:'bg-ink-3/10 text-ink-3 ring-ink-3/25', violet:'bg-violet-400/10 text-violet-300 ring-violet-300/25' };
+export const stockStatus = (product) => Number(product?.quantity) === 0 ? ['Out of stock','bad'] : Number(product?.quantity) <= Number(product?.minimumStock ?? 10) ? ['Low stock','warn'] : ['In stock','ok'];

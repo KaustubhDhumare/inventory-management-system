@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const auditLog = new mongoose.Schema(
+const auditLogSchema = new mongoose.Schema(
   {
     performedBy: {
       type: mongoose.Schema.Types.ObjectId,
@@ -10,7 +10,6 @@ const auditLog = new mongoose.Schema(
     action: {
       type: String,
       trim: true,
-      enum: ["UPDATE", "DELETE", "CREATE"],
       required: true,
     },
     collectionName: {
@@ -30,8 +29,8 @@ const auditLog = new mongoose.Schema(
       required: true,
     },
     changes: {
-        type: mongoose.Schema.Types.Mixed,
-        required: true
+      type: mongoose.Schema.Types.Mixed,
+      required: true,
     },
     remarks: {
       type: String,
@@ -39,7 +38,12 @@ const auditLog = new mongoose.Schema(
       maxlength: [500, "Remarks cannot exceed 500 characters"],
     },
   },
-  {
-    timestamps: true,
-  },
+  { timestamps: true },
 );
+
+auditLogSchema.index({ createdAt: -1 });
+auditLogSchema.index({ performedBy: 1, createdAt: -1 });
+
+const AuditLog = mongoose.model("AuditLog", auditLogSchema);
+
+export default AuditLog;

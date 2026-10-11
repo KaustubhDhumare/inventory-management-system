@@ -39,8 +39,26 @@ const loginValidator = [
     .withMessage("Password is required")
 ];
 
+const changePasswordValidator = [
+  body("currentPassword")
+    .isString()
+    .notEmpty()
+    .withMessage("Current password is required"),
+  body("newPassword")
+    .isString()
+    .isLength({ min: 8, max: 128 })
+    .withMessage("New password must be between 8 and 128 characters")
+    .custom((value, { req }) => {
+      if (value === req.body.currentPassword) {
+        throw new Error("New password must be different from your current password");
+      }
+      return true;
+    }),
+];
+
 export {
     registerValidators,
-    loginValidator
+    loginValidator,
+    changePasswordValidator,
 } 
     

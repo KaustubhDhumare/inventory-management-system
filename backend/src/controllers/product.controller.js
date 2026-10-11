@@ -7,9 +7,11 @@ import {
   updateProduct as updateProductService,
   updateProductStatus as updateProductStatusService,
 } from "../services/product.service.js";
+import { recordAuditLog } from "../services/auditLog.service.js";
 
 const addProduct = asyncHandler(async (req, resp) => {
   const product = await createProduct(req.body, req.user._id);
+  await recordAuditLog({ performedBy: req.user._id, action: "CREATE", collectionName: "Product", documentId: product._id, changes: { after: req.body } });
 
   return resp
     .status(200)
@@ -34,6 +36,7 @@ const getProduct = asyncHandler(async (req, resp) => {
 
 const updateProduct = asyncHandler(async (req, resp) => {
   const updatedProduct = await updateProductService(req.params.id, req.body);
+  await recordAuditLog({ performedBy: req.user._id, action: "UPDATE", collectionName: "Product", documentId: updatedProduct._id, changes: { submitted: req.body } });
 
   return resp
     .status(200)
@@ -51,6 +54,7 @@ const updateProductStatus = asyncHandler(async (req, resp) => {
     req.params.id,
     req.body.isActive,
   );
+  await recordAuditLog({ performedBy: req.user._id, action: "STATUS_CHANGED", collectionName: "Product", documentId: updatedProduct._id, changes: { isActive: updatedProduct.isActive } });
 
   return resp
     .status(200)
