@@ -93,10 +93,33 @@ const logout = asyncHandler(async (req, resp)=>{
 const refreshAccessToken = asyncHandler (async (req, resp)=>{
     const incomingRefreshToken = req.cookies?.refreshToken;
 
-    const {
-        accessToken,
-        user
-    } = await refreshAccessTokenService(incomingRefreshToken);
+    // A signed-out visitor has no refresh cookie. Treat that as an anonymous
+    // session instead of returning a noisy 401 on every initial page load.
+    if (!incomingRefreshToken) {
+        return resp
+            .status(200)
+            .clearCookie("accessToken", cookieOptions)
+            .clearCookie("refreshToken", cookieOptions)
+            .json(new ApiResponse(200, { user: null }, "No active session"));
+    }
+
+    let session;
+    try {
+        session = await refreshAccessTokenService(incomingRefreshToken);
+    } catch (error) {
+        // Expired, revoked, or otherwise stale refresh tokens mean the user is
+        // signed out. Clear them so the same failure does not recur on reload.
+        if (error.statusCode === 401) {
+            return resp
+                .status(200)
+                .clearCookie("accessToken", cookieOptions)
+                .clearCookie("refreshToken", cookieOptions)
+                .json(new ApiResponse(200, { user: null }, "Session expired"));
+        }
+        throw error;
+    }
+
+    const { accessToken, user } = session;
 
     return resp
         .status(200)
