@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="420" viewBox="0 0 1200 420" fill="none">
+  <defs>
+    <linearGradient id="background" x1="40" y1="20" x2="1150" y2="420" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#10172A"/>
+      <stop offset="1" stop-color="#0B1020"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#8577FF"/>
+      <stop offset="1" stop-color="#6556F0"/>
+    </linearGradient>
+    <linearGradient id="glow" x1="880" y1="0" x2="1200" y2="340" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#7567F8" stop-opacity=".2"/>
+      <stop offset="1" stop-color="#35C9E7" stop-opacity=".03"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="420" rx="24" fill="url(#background)"/>
+  <circle cx="1070" cy="64" r="250" fill="url(#glow)"/>
+  <path d="M32 1h1136a32 32 0 0 1 32 32v4H0v-4A32 32 0 0 1 32 1Z" fill="url(#accent)"/>
+
+  <g font-family="Inter,Segoe UI,Arial,sans-serif">
+    <rect x="64" y="62" width="44" height="44" rx="13" fill="url(#accent)"/>
+    <path d="m77 76 9-5 9 5v15l-9 5-9-5V76Z" stroke="#fff" stroke-width="2" stroke-linejoin="round"/>
+    <path d="m77 76 9 5 9-5M86 81v15" stroke="#fff" stroke-width="2" stroke-linejoin="round"/>
+    <text x="120" y="91" fill="#F1F5FF" font-size="21" font-weight="700">StockPilot</text>
+
+    <text x="64" y="166" fill="#A99FFF" font-size="13" font-weight="700" letter-spacing="2.2">INVENTORY OPERATIONS</text>
+    <text x="64" y="222" fill="#F1F5FF" font-size="42" font-weight="700" letter-spacing="-1.4">Inventory, in control.</text>
+    <text x="64" y="258" fill="#A1AEC5" font-size="17">Manage products, purchase orders, and stock</text>
+    <text x="64" y="283" fill="#A1AEC5" font-size="17">movements from one streamlined workspace.</text>
+
+    <g font-size="13" font-weight="600">
+      <rect x="64" y="318" width="132" height="34" rx="17" fill="#7567F8" fill-opacity=".13" stroke="#7567F8" stroke-opacity=".35"/>
+      <circle cx="82" cy="335" r="4" fill="#34D399"/>
+      <text x="94" y="340" fill="#D8D3FF">Live application</text>
+      <text x="64" y="386" fill="#7F8CA6" font-size="12" font-weight="400">React · Express · MongoDB</text>
+    </g>
+  </g>
+
+  <g>
+    <rect x="682" y="54" width="454" height="341" rx="16" fill="#080D1A" fill-opacity=".62" stroke="#34436A"/>
+    <path d="M698 54h422a16 16 0 0 1 16 16v27H682V70a16 16 0 0 1 16-16Z" fill="#151E32"/>
+    <circle cx="704" cy="75" r="4" fill="#F87171"/>
+    <circle cx="719" cy="75" r="4" fill="#FBBF24"/>
+    <circle cx="734" cy="75" r="4" fill="#34D399"/>
+    <rect x="808" y="64" width="202" height="21" rx="6" fill="#0F1729" stroke="#26324D"/>
+    <text x="831" y="78" fill="#7F8CA6" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="9">stockpilot · sign in</text>
+
+    <rect x="720" y="113" width="378" height="265" rx="11" fill="#0B1020"/>
+    <rect x="748" y="137" width="30" height="30" rx="9" fill="url(#accent)"/>
+    <path d="m757 146 6-3 6 3v10l-6 3-6-3v-10Z" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/>
+    <path d="m757 146 6 3 6-3m-6 3v10" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/>
+    <text x="787" y="156" fill="#F1F5FF" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="12" font-weight="700">StockPilot</text>
+
+    <text x="748" y="194" fill="#7567F8" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="8" font-weight="700" letter-spacing="1.2">INVENTORY OPERATIONS</text>
+    <text x="748" y="219" fill="#F1F5FF" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="18" font-weight="700">Welcome back</text>
+    <text x="748" y="236" fill="#A1AEC5" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="9">Sign in to continue to your workspace.</text>
+
+    <text x="748" y="260" fill="#A1AEC5" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="8">Email address</text>
+    <rect x="748" y="267" width="320" height="24" rx="6" fill="#0F1729" stroke="#26324D"/>
+    <text x="748" y="307" fill="#A1AEC5" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="8">Password</text>
+    <rect x="748" y="314" width="320" height="24" rx="6" fill="#0F1729" stroke="#26324D"/>
+    <rect x="748" y="350" width="320" height="23" rx="6" fill="url(#accent)"/>
+    <text x="908" y="365" text-anchor="middle" fill="#fff" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="9" font-weight="600">Sign in</text>
+  </g>
+</svg>

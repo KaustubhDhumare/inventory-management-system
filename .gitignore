@@ -1,7 +1,11 @@
-node_modules
+﻿node_modules
 .env
+.env.*
+!frontend/.env.example
+!backend/.env.example
 dist
 build
 uploads
-FRONTEND_SPEC.md
-README
+frontendDesign
+docs/
+README_ProjectDetails.md
